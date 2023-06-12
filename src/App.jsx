@@ -1,6 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import TaskItem from './components/TaskItem';
+import {
+  getTodoItemsFromLocalStorage,
+  saveTodoItemsToLocalStorage,
+} from './localStorageUtils';
 
 const App = () => {
   const [tasks, setTasks] = useState([]);
@@ -9,9 +13,9 @@ const App = () => {
 
   useEffect(() => {
     try {
-      const storedTasks = localStorage.getItem('tasks');
+      const storedTasks = getTodoItemsFromLocalStorage('tasks');
       if (storedTasks) {
-        const parsedTasks = JSON.parse(storedTasks);
+        const parsedTasks = storedTasks;
 
         // Move completed tasks to the bottom of the array
         const completedTasks = parsedTasks.filter((task) => task.completed);
@@ -27,7 +31,7 @@ const App = () => {
 
   useEffect(() => {
     try {
-      localStorage.setItem('tasks', JSON.stringify(tasks));
+      saveTodoItemsToLocalStorage('tasks', tasks);
     } catch (error) {
       console.error('Error storing tasks in LocalStorage:', error);
     }

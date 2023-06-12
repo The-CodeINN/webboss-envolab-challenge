@@ -1,41 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import TaskItem from './components/TaskItem';
-import {
-  getTodoItemsFromLocalStorage,
-  saveTodoItemsToLocalStorage,
-} from './localStorageUtils';
+import { getTodoItemsFromLocalStorage, saveTodoItemsToLocalStorage } from './helpers/helpers';
 
 const App = () => {
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState(getTodoItemsFromLocalStorage('tasks'));
   const [newTask, setNewTask] = useState('');
   const [newTaskDescription, setNewTaskDescription] = useState('');
-
-  useEffect(() => {
-    try {
-      const storedTasks = getTodoItemsFromLocalStorage('tasks');
-      if (storedTasks) {
-        const parsedTasks = storedTasks;
-
-        // Move completed tasks to the bottom of the array
-        const completedTasks = parsedTasks.filter((task) => task.completed);
-        const pendingTasks = parsedTasks.filter((task) => !task.completed);
-        const sortedTasks = [...pendingTasks, ...completedTasks];
-
-        setTasks(sortedTasks);
-      }
-    } catch (error) {
-      console.error('Error accessing or parsing stored tasks:', error);
-    }
-  }, []);
-
-  useEffect(() => {
-    try {
-      saveTodoItemsToLocalStorage('tasks', tasks);
-    } catch (error) {
-      console.error('Error storing tasks in LocalStorage:', error);
-    }
-  }, [tasks]);
 
   const handleInputChange = useCallback((event) => {
     setNewTask(event.target.value);
@@ -64,6 +35,7 @@ const App = () => {
       setTasks(updatedTasks);
       setNewTask('');
       setNewTaskDescription('');
+      saveTodoItemsToLocalStorage('tasks', updatedTasks);
     } else {
       alert('Task title cannot be empty.');
     }
@@ -78,18 +50,16 @@ const App = () => {
         return task;
       });
 
-      // Move completed tasks to the bottom of the array
-      const completedTasks = updatedTasks.filter((task) => task.completed);
-      const pendingTasks = updatedTasks.filter((task) => !task.completed);
-      const sortedTasks = [...pendingTasks, ...completedTasks];
-
-      return sortedTasks;
+      saveTodoItemsToLocalStorage('tasks', updatedTasks);
+      return updatedTasks;
     });
   }, []);
 
   const handleDeleteTask = useCallback((id) => {
     setTasks((prevTasks) => {
-      return prevTasks.filter((task) => task.id !== id);
+      const updatedTasks = prevTasks.filter((task) => task.id !== id);
+      saveTodoItemsToLocalStorage('tasks', updatedTasks);
+      return updatedTasks;
     });
   }, []);
 
@@ -118,11 +88,11 @@ const App = () => {
       </div>
       <button
         onClick={handleAddTask}
-        className='px-4 py-2 bg-blue-500 text-white rounded'
+        className='px-4 py-2 bg-blue-500 text-white rounded mb-8'
       >
         Add Task
       </button>
-      <ul className='list-none'>
+      <ul className='list-none mb-3'>
         {tasks.map((task) => (
           <TaskItem
             key={task.id}

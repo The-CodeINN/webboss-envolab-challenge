@@ -1,4 +1,5 @@
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 const TaskItem = ({ task, onToggleTask, onDeleteTask }) => {
   const handleCheckboxChange = () => {
@@ -13,7 +14,7 @@ const TaskItem = ({ task, onToggleTask, onDeleteTask }) => {
     <div className='flex'>
       <article
         className={`flex items-center mb-2 ${
-          task.completed ? 'line-through' : ''
+          task.completed ? "line-through" : ""
         }`}
         key={task.id}
         role='listitem'
@@ -25,18 +26,24 @@ const TaskItem = ({ task, onToggleTask, onDeleteTask }) => {
           className='mr-2'
           aria-label={`Mark task "${task.title}" as completed`}
         />
-        <h2 className='mr-2'>{task.title}</h2>
-        <p className='text-gray-500 text-sm'>{task.description}</p>
+        <div className='flex-grow'>
+          <h2 className='mr-2' style={{ width: "200px" }}>
+            {task.title}
+          </h2>
+          <p className='text-gray-500 text-sm' style={{ width: "200px" }}>
+            {task.description}
+          </p>
+        </div>
       </article>
-      <p className='ml-auto text-gray-500 text-sm'>
-        {task.completed ? 'Completed' : 'Pending'}
+      <p className='ml-auto text-gray-500 text-sm flex-shrink-0'>
+        {task.completed ? "Completed" : "Pending"}
       </p>
       <button
         onClick={handleDeleteClick}
-        className='ml-auto px-4 py-2 bg-red-500 text-white rounded'
+        className='ml-auto px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 flex-shrink-0 max-h-8 overflow-hidden'
         aria-label={`Delete task "${task.title}"`}
       >
-        Delete
+        <RiDeleteBinLine />
       </button>
     </div>
   );
